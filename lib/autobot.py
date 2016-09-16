@@ -7,9 +7,9 @@ class Autobot():
         self.con = Console()
         self.jenkins = Jenkins('http://10.89.104.33')
 
-    def run(self, view_name):
+    def run(self, view_name, resume):
         view_name = self.alias(view_name)
-        if self.jenkins.enable(view_name):
+        if self.jenkins.enable(view_name, resume):
             self.jenkins.build(view_name)
 
     def alias(self, view_name):

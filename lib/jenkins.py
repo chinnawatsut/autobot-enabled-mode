@@ -10,13 +10,14 @@ class Jenkins():
         self.base = base_url
         self.view_cache = {}
 
-    def enable(self, view_name):
+    def enable(self, view_name, do_not_enable_child):
         self.con.out("Enabling view " + view_name + " and all children...", self.con.White)
         if self.trigger_post(self.base + '/job/' + view_name + '/enable'):
-            tasks = self.view(view_name)
-            for t in tasks:
-                self.con.out("- Enabling job " + t + "...", self.con.White)
-                self.trigger_post(self.base + '/job/' + t + '/enable')
+            if not do_not_enable_child:
+                tasks = self.view(view_name)
+                for t in tasks:
+                    self.con.out("- Enabling job " + t + "...", self.con.White)
+                    self.trigger_post(self.base + '/job/' + t + '/enable')
             return True
         return False
 
@@ -46,27 +47,30 @@ class Jenkins():
         while len(tasks) > 0 and retry_count < retry_max:
             for t in tasks:
                 result = self.get(self.base + '/job/' + t + '/api/json')
-                nextBuildNumber = result['nextBuildNumber']
-                self.con.out("- Building job " + t + " #" + str(nextBuildNumber) + "...", self.con.White)
-                if self.trigger_post(self.base + '/job/' + t + '/build', False):
-                    self.wait_until_task_done(t, nextBuildNumber)
-                    stat = self.grep_stat(t, nextBuildNumber)
-                    fail_count = stat.attrib['fail']
-                    pass_count = stat.attrib['pass']
-                    if fail_count == "0":
-                        self.con.outln("PASSED [" + pass_count + "/" + pass_count + "]", self.con.Green)
-                        self.con.out("- - Disabling job " + t + "...", self.con.White)
-                        self.trigger_post(self.base + '/job/' + t + '/disable')
-                    else:
-                        self.con.outln("FAILED [" + pass_count + "/" + str(int(pass_count) + int(fail_count)) + "]", self.con.Red)
-                        should_retry = self.analyze_error_log(t, nextBuildNumber)
-                        if should_retry:
-                            retry_tasks.append(t)
+                if result['color'] != 'disabled':
+                    nextBuildNumber = result['nextBuildNumber']
+                    self.con.out("- Building job " + t + " #" + str(nextBuildNumber) + "...", self.con.White)
+                    if self.trigger_post(self.base + '/job/' + t + '/build', False):
+                        self.wait_until_task_done(t, nextBuildNumber)
+                        stat = self.grep_stat(t, nextBuildNumber)
+                        fail_count = stat.attrib['fail']
+                        pass_count = stat.attrib['pass']
+                        if fail_count == "0":
+                            self.con.outln("PASSED [" + pass_count + "/" + pass_count + "]", self.con.Green)
+                            self.con.out("- - Disabling job " + t + "...", self.con.White)
+                            self.trigger_post(self.base + '/job/' + t + '/disable')
                         else:
-                            critical_fail = critical_fail.append(t)
+                            self.con.outln("FAILED [" + pass_count + "/" + str(int(pass_count) + int(fail_count)) + "]", self.con.Red)
+                            should_retry = self.analyze_error_log(t, nextBuildNumber)
+                            if should_retry:
+                                retry_tasks.append(t)
+                            else:
+                                critical_fail = critical_fail.append(t)
+                else:
+                    self.con.outln("- Skipping job " + t + " due to job is disabled...", self.con.White)
             if len(retry_tasks) > 0:
                 retry_count += 1
-                self.con.outln("Retry #" + str(retry_count) + " " + str(len(retry_tasks)) + " task(s)", self.con.White)
+                self.con.outln("Retry #" + str(retry_count) + " : " + str(len(retry_tasks)) + " task(s)", self.con.White)
                 tasks = retry_tasks
                 retry_tasks = []
             else:
