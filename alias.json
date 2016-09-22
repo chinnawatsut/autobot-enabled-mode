@@ -20,5 +20,6 @@
     "20": "DEV_S20_Landing_Prepaid_Corp_Club",
     "22": "DEV_S22_RefillVoucher_Cash_Card",
     "23": "DEV_S23_Contact_History_Offline",
-    "24": "DEV_S24_Social_Contact"
+    "24": "DEV_S24_Social_Contact",
+    "25": "DEV_S25_Auto_Sent_SMS"
 }
