@@ -11,7 +11,10 @@ class Jenkins():
         self.view_cache = {}
 
     def enable(self, view_name, do_not_enable_child):
-        self.con.out("Enabling view " + view_name + " and all children...", self.con.White)
+        if do_not_enable_child:
+            self.con.out("Enabling view " + view_name + " and resuming all enabled children...", self.con.White)
+        else:
+            self.con.out("Enabling view " + view_name + " and all children...", self.con.White)
         if self.trigger_post(self.base + '/job/' + view_name + '/enable'):
             if not do_not_enable_child:
                 tasks = self.view(view_name)
