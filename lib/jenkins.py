@@ -44,7 +44,7 @@ class Jenkins():
         critical_fail = []
         retry_max = 3
         retry_count = 0
-        while len(tasks) > 0 and retry_count < retry_max:
+        while len(tasks) > 0 and retry_count <= retry_max:
             for t in tasks:
                 result = self.get(self.base + '/job/' + t + '/api/json')
                 if result['color'] != 'disabled':
@@ -57,7 +57,7 @@ class Jenkins():
                         pass_count = stat.attrib['pass']
                         if fail_count == "0":
                             self.con.outln("PASSED [" + pass_count + "/" + pass_count + "]", self.con.Green)
-                            self.con.out("- - Disabling job " + t + "...", self.con.White)
+                            self.con.out("--= Disabling job " + t + "...", self.con.White)
                             self.trigger_post(self.base + '/job/' + t + '/disable')
                         else:
                             self.con.outln("FAILED [" + pass_count + "/" + str(int(pass_count) + int(fail_count)) + "]", self.con.Red)
