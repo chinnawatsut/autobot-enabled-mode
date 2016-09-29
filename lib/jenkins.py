@@ -73,7 +73,8 @@ class Jenkins():
                     self.con.outln("- Skipping job " + t + " due to job is disabled...", self.con.White)
             if len(retry_tasks) > 0:
                 retry_count += 1
-                self.con.outln("Retry #" + str(retry_count) + " : " + str(len(retry_tasks)) + " task(s)", self.con.White)
+                if retry_count <= retry_max:
+                    self.con.outln("Retry #" + str(retry_count) + " : " + str(len(retry_tasks)) + " task(s)", self.con.White)
                 tasks = retry_tasks
                 retry_tasks = []
             else:
