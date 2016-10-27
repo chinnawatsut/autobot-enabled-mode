@@ -144,3 +144,7 @@ class Jenkins():
                 root = ET.fromstring(resp.content)
                 return root
         return None
+
+    def get_config(self, view_name):
+        resp = self.get(self.base + '/job/' + view_name + '/config.xml')
+        return resp
