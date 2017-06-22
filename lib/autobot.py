@@ -10,7 +10,7 @@ class Autobot():
     def run(self, view_name, resume):
         view_name = self.alias(view_name)
         if self.jenkins.enable(view_name, resume):
-            self.jenkins.build(view_name)
+            self.con.outln(view_name + " is Enabled ", self.con.Yellow)
 
     def alias(self, view_name):
         with open('alias.json') as data_file:
