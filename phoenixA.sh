@@ -19,6 +19,8 @@ echo "Autobot for PhoenixA"
 ./main.py   DEV_Unbilled
 ./main.py   DEV_Usage_Summary
 ./main.py   DEV_User_Inquiry
+./main.py   DEV_ChangeProfile_Customer_Responsive
+./main.py   DEV_Registration_Multiple
 
 echo "Have a good day :)"
 
