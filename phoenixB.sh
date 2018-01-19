@@ -19,5 +19,7 @@ echo "Autobot for PhoenixB"
 ./main.py   DEV_Sales_Order
 ./main.py   DEV_support_refresh_service_order
 ./main.py   Dev_Swap_number
+./main.py   DEV_Nice_Number
+./main.py   DEV_Blacklist_Graylist
 
 echo "Have a good day :)"
